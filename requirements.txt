@@ -1,0 +1,12 @@
+# Core dependencies for SOFTWAREFACTORY
+langgraph
+langchain
+pydantic>=2.0
+python-dotenv
+docker
+typer
+rich
+
+# Test / dev
+pytest
+pytest-asyncio

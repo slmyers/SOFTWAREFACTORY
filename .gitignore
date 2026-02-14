@@ -1,0 +1,30 @@
+# Python cache / bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test / coverage
+.pytest_cache/
+.coverage
+
+# Packaging / build
+pip-wheel-metadata/
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.local
+
+# Editor / OS files
+.python-version
+.vscode/
+.idea/
+.DS_Store
+.ipynb_checkpoints
