@@ -28,3 +28,6 @@ env/
 .idea/
 .DS_Store
 .ipynb_checkpoints
+
+# LangSmith specific
+.langgraph_api/

@@ -30,12 +30,12 @@ Create the SOFTWAREFACTORY repository with the exact structure from PLAN.md.
 
 ## Tasks
 - [x] Create GitHub repo (public or private)
-- [ ] Add `.gitignore` (Python + venv + .env)
-- [ ] Create `pyproject.toml` (or requirements.txt) with core deps: langgraph, langchain, pydantic, python-dotenv, docker, etc.
-- [ ] Add `.env.example`
-- [ ] Create `README.md` with quickstart + link to `docs/PLAN.md`
-- [ ] Create empty directories: `agents/`, `tools/`, `graph/`, `harness/`, `sandbox/`, `mcp/`, `specs/`, `tests/`, `docs/`
-- [ ] Commit initial skeleton + push
+- [x] Add `.gitignore` (Python + venv + .env)
+- [x] Create `pyproject.toml` (or requirements.txt) with core deps: langgraph, langchain, pydantic, python-dotenv, docker, etc.
+- [x] Add `.env.example`
+- [x] Create `README.md` with quickstart + link to `docs/PLAN.md`
+- [x] Create empty directories: `agents/`, `tools/`, `graph/`, `harness/`, `sandbox/`, `mcp/`, `specs/`, `tests/`, `docs/`
+- [x] Commit initial skeleton + push
 
 ## Definition of Done
 Repo matches the structure in PLAN.md and is cloneable.
@@ -53,12 +53,9 @@ Repo matches the structure in PLAN.md and is cloneable.
 Set up tracing for the entire graph.
 
 ## Tasks
-- [ ] Sign up / configure LangSmith (free tier)
-- [ ] Add LangSmith env vars to `.env.example`
-- [ ] Install `langgraph-cli` and test `langgraph dev`
-- [ ] Set up Langfuse self-hosted via Docker (docker-compose.yml)
-- [ ] Add Langfuse callback example in a test script
-- [ ] Document how to run Studio + Langfuse in README
+- [x] Sign up / configure LangSmith (free tier)
+- [x] Add LangSmith env vars to `.env.example`
+- [x] Install `langgraph-cli` and test `langgraph dev`
 
 ## Definition of Done
 `langgraph dev` works and traces appear in both LangSmith and Langfuse.
@@ -76,11 +73,11 @@ Set up tracing for the entire graph.
 Define the central typed state for the entire graph.
 
 ## Tasks
-- [ ] Create `graph/state.py`
-- [ ] Implement `AgentState` as TypedDict + Pydantic model (v2)
-- [ ] Add all fields from PLAN.md (spec_path, codebase, quality_score, etc.)
-- [ ] Add validation (e.g. non-negative iteration, required fields)
-- [ ] Add serialization helpers (to_dict, from_dict)
+- [x] Create `graph/state.py`
+- [x] Implement `AgentState` as TypedDict + Pydantic model (v2)
+- [x] Add all fields from PLAN.md (spec_path, codebase, quality_score, etc.)
+- [x] Add validation (e.g. non-negative iteration, required fields)
+- [x] Add serialization helpers (to_dict, from_dict)
 
 ## Definition of Done
 State passes Pydantic validation and can be checkpointed.
@@ -327,3 +324,69 @@ Make GenAI Toolbox and MCP-Obsidian first-class.
 (And so on for the rest of the tools — each has its own tight, parallelizable issue.)
 
 ---
+
+Issue #47: Unified Diff Editing Pipeline
+Labels: tools, agent, harness
+Milestone: 3-Tools
+Body:
+text# Unified Diffs for Safe, Precise Edits
+
+Adopt the industry-standard edit format used by Aider/Cursor.
+
+## Tasks
+- [ ] Update Coder prompt to force GNU unified diff output only
+- [ ] Create `tools/file_edits.py` with `apply_unified_diff(path, diff_content)`
+- [ ] Add `patch` library + safety checks (no deletions outside project, etc.)
+- [ ] Update Reviewer to critique diffs (not full files)
+- [ ] Add diff preview in CLI + LangSmith trace
+- [ ] Test on 5 real edits (add feature, refactor, bugfix)
+
+## Definition of Done
+Coder → Reviewer → apply loop works end-to-end with <5% hallucinated diffs.
+
+Issue #48: Codebase Semantic Index + Hybrid Search Tool
+Labels: tools, mcp, harness
+Milestone: 3-Tools
+Body:
+text# Semantic Codebase Search (RAG for Agents)
+
+Give every agent instant, intent-aware codebase understanding.
+
+## Tasks
+- [ ] Create `tools/code_index.py` (chunk by function/class + embed)
+- [ ] Choose embedding model (Qwen3 or BGE-M3 via OpenAI-compatible)
+- [ ] Set up Chroma/PGVector store (persist in `./.softwarefactory/index/`)
+- [ ] Implement `codebase_search` tool (hybrid semantic + keyword)
+- [ ] Auto-reindex on git changes (via git hook or Executor)
+- [ ] Integrate with MCP so external tools can also query it
+- [ ] Benchmark: "find auth logic" vs grep on todo-app spec
+
+## Definition of Done
+Agents using `codebase_search` solve tasks 20%+ faster in e2e tests.
+
+Issue #49: Playwright MCP Browser Automation Server
+Labels: tools, mcp, harness, priority-high
+Milestone: 3-Tools
+Assignees: @slmyers780 (or the first person who wants to own browser god-mode)
+Body (copy-paste ready):
+text# Playwright MCP Integration
+
+Give agents full browser control via official Microsoft MCP server.
+
+## Why now
+- Perfect complement to our existing MCP registry (GenAI Toolbox, Obsidian)
+- Enables real E2E testing, UI validation, self-healing tests
+- Matches OpenAI Harness observability (videos, snapshots)
+- Works out-of-the-box with DeepSeek/Qwen
+
+## Tasks
+- [ ] Add Playwright MCP to MCP registry (auto-discover + launch script)
+- [ ] Create `tools/browser.py` wrapper (`browser_action` tool)
+- [ ] Docker compose entry for playwright-mcp (headless + persistent)
+- [ ] Update Executor/Reviewer prompts to use it for web specs
+- [ ] Add video recording + accessibility tree to quality-score.md
+- [ ] E2E test: agent builds a TODO app → runs browser tests → passes
+- [ ] Benchmark: time-to-green for web specs with vs without browser tools
+
+## Definition of Done
+Any web-related spec can be fully implemented + tested end-to-end by the graph with zero human browser interaction.
