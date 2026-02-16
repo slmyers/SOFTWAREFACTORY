@@ -68,3 +68,5 @@ infra/**/*.tgz
 
 # Also ignore any infra-scoped state files explicitly
 infra/**/terraform.tfstate*
+
+.ruff_cache/
