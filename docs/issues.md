@@ -17,9 +17,9 @@ I’ve formatted them so you can copy one at a time or script it.
 
 ### Milestone 0: Foundations
 
-**Issue #1: Repo bootstrap + dev environment (SOFTWAREFACTORY)**  
-**Labels:** `infra`, `setup`  
-**Milestone:** 0-Foundations  
+**Issue #1: Repo bootstrap + dev environment (SOFTWAREFACTORY)**
+**Labels:** `infra`, `setup`
+**Milestone:** 0-Foundations
 **Assignees:** @raptor-mini
 
 **Body:**
@@ -41,10 +41,10 @@ Create the SOFTWAREFACTORY repository with the exact structure from PLAN.md.
 Repo matches the structure in PLAN.md and is cloneable.
 ```
 
-**Issue #2: LangSmith + LangGraph Studio + Langfuse self-hosted setup**  
-**Labels:** `infra`, `observability`  
-**Milestone:** 0-Foundations  
-**Assignees:** @slmyers780  
+**Issue #2: LangSmith + LangGraph Studio + Langfuse self-hosted setup**
+**Labels:** `infra`, `observability`
+**Milestone:** 0-Foundations
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -61,10 +61,10 @@ Set up tracing for the entire graph.
 `langgraph dev` works and traces appear in both LangSmith and Langfuse.
 ```
 
-**Issue #3: Pydantic v2 AgentState (full typed dict with validation)**  
-**Labels:** `core`, `state`  
-**Milestone:** 0-Foundations  
-**Assignees:** @slmyers780  
+**Issue #3: Pydantic v2 AgentState (full typed dict with validation)**
+**Labels:** `core`, `state`
+**Milestone:** 0-Foundations
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -83,10 +83,10 @@ Define the central typed state for the entire graph.
 State passes Pydantic validation and can be checkpointed.
 ```
 
-**Issue #4: AGENTS.md + quality-score.md + invariants.md templates (harness scaffolding)**  
-**Labels:** `harness`, `docs`  
-**Milestone:** 0-Foundations  
-**Assignees:** @slmyers780  
+**Issue #4: AGENTS.md + quality-score.md + invariants.md templates (harness scaffolding)**
+**Labels:** `harness`, `docs`
+**Milestone:** 0-Foundations
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -109,10 +109,10 @@ Templates exist and match the Harness philosophy.
 
 ### Milestone 1: Core Graph & State
 
-**Issue #5: AgentState + checkpointing (Postgres + JSON fallback)**  
-**Labels:** `core`, `state`  
-**Milestone:** 1-Core-Graph  
-**Assignees:** @slmyers780  
+**Issue #5: AgentState + checkpointing (Postgres + JSON fallback)**
+**Labels:** `core`, `state`
+**Milestone:** 1-Core-Graph
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -121,21 +121,21 @@ Templates exist and match the Harness philosophy.
 Make the graph resumable across runs.
 
 ## Tasks
-- [ ] Add Postgres support (SQLAlchemy + async)
-- [ ] Implement JSON file fallback
-- [ ] Add `save_checkpoint` / `load_checkpoint` to state
-- [ ] Use LangGraph’s built-in checkpointing with custom saver
-- [ ] Add terraform config for local postgres with docker
-- [ ] Add any necessary migrations
+- [x] Add Postgres support (SQLAlchemy + async)
+- [x] Implement JSON file fallback
+- [x] Add `save_checkpoint` / `load_checkpoint` to state
+- [x] Use LangGraph’s built-in checkpointing with custom saver
+- [x] Add terraform config for local postgres with docker
+- [x] Add any necessary migrations
 
 ## Definition of Done
 A run can be killed and resumed with `python main.py resume --thread_id xxx`
 ```
 
-**Issue #6: Load/save from spec.md + codebase dict**  
-**Labels:** `core`, `filesystem`  
-**Milestone:** 1-Core-Graph  
-**Assignees:** @slmyers780  
+**Issue #6: Load/save from spec.md + codebase dict**
+**Labels:** `core`, `filesystem`
+**Milestone:** 1-Core-Graph
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -152,10 +152,10 @@ Agents must always work against real files on disk.
 After any run, spec.md and all code files are up-to-date on disk.
 ```
 
-**Issue #7: Supervisor node + routing logic**  
-**Labels:** `agent`, `supervisor`  
-**Milestone:** 1-Core-Graph  
-**Assignees:** @slmyers780  
+**Issue #7: Supervisor node + routing logic**
+**Labels:** `agent`, `supervisor`
+**Milestone:** 1-Core-Graph
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -173,10 +173,10 @@ Central decision maker.
 Supervisor correctly routes to next node in a test graph.
 ```
 
-**Issue #8: Decision prompts + few-shot examples for DeepSeek-R1**  
-**Labels:** `agent`, `prompts`  
-**Milestone:** 1-Core-Graph  
-**Assignees:** @slmyers780  
+**Issue #8: Decision prompts + few-shot examples for DeepSeek-R1**
+**Labels:** `agent`, `prompts`
+**Milestone:** 1-Core-Graph
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -193,10 +193,10 @@ Make routing reliable.
 Supervisor makes correct routing 95%+ of the time in tests.
 ```
 
-**Issue #9: graph/compile.py factory with all nodes wired (empty stubs)**  
-**Labels:** `core`, `graph`  
-**Milestone:** 1-Core-Graph  
-**Assignees:** @slmyers780  
+**Issue #9: graph/compile.py factory with all nodes wired (empty stubs)**
+**Labels:** `core`, `graph`
+**Milestone:** 1-Core-Graph
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -213,10 +213,10 @@ Central place to build the LangGraph.
 `compile_graph()` returns a runnable app.
 ```
 
-**Issue #10: Entry points: CLI run, dev, resume**  
-**Labels:** `cli`, `infra`  
-**Milestone:** 1-Core-Graph  
-**Assignees:** @slmyers780  
+**Issue #10: Entry points: CLI run, dev, resume**
+**Labels:** `cli`, `infra`
+**Milestone:** 1-Core-Graph
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -237,10 +237,10 @@ User-friendly entrypoints.
 
 ### Milestone 2: Agents / Nodes
 
-**Issue #11: SpecParser node**  
-**Labels:** `agent`  
-**Milestone:** 2-Agents  
-**Assignees:** @slmyers780  
+**Issue #11: SpecParser node**
+**Labels:** `agent`
+**Milestone:** 2-Agents
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -259,10 +259,10 @@ Node correctly populates state.spec_structure.
 
 (Continue similarly for #12–#19 — each gets its own focused template with 4–6 checkbox tasks matching the role in the spec.)
 
-**Issue #19: DocGardener node**  
-**Labels:** `agent`, `harness`  
-**Milestone:** 2-Agents  
-**Assignees:** @slmyers780  
+**Issue #19: DocGardener node**
+**Labels:** `agent`, `harness`
+**Milestone:** 2-Agents
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -283,10 +283,10 @@ Runs after Supervisor and cleans up.
 
 ### Milestone 3: Tools
 
-**Issue #20: Filesystem tools**  
-**Labels:** `tools`  
-**Milestone:** 3-Tools  
-**Assignees:** @slmyers780  
+**Issue #20: Filesystem tools**
+**Labels:** `tools`
+**Milestone:** 3-Tools
+**Assignees:** @slmyers780
 
 **Body:**
 ```
@@ -303,10 +303,10 @@ Core read/write for agents.
 All agents can read/write spec and code.
 ```
 
-**Issue #26: MCP Client + registry**  
-**Labels:** `tools`, `mcp`  
-**Milestone:** 3-Tools  
-**Assignees:** @slmyers780  
+**Issue #26: MCP Client + registry**
+**Labels:** `tools`, `mcp`
+**Milestone:** 3-Tools
+**Assignees:** @slmyers780
 
 **Body:**
 ```

@@ -70,3 +70,7 @@ infra/**/*.tgz
 infra/**/terraform.tfstate*
 
 .ruff_cache/
+
+# Local checkpoints and temp files created by the harness
+checkpoints/
+.sf_tmp_*
