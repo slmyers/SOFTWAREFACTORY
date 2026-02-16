@@ -27,6 +27,8 @@ After `terraform apply`, the following outputs are available:
 |--------|-------------|
 | `database_url` | Async connection URL (for asyncpg driver) |
 | `database_url_sync` | Sync connection URL (for Alembic/psycopg2) |
+| `database_url_test` | Async connection URL for the test database (asyncpg) |
+| `database_url_test_sync` | Sync connection URL for the test database (psycopg2) |
 | `container_name` | Docker container name |
 | `postgres_host` | Database host (localhost) |
 | `postgres_port` | Database port (default: 5432) |

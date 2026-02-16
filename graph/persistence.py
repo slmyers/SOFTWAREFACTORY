@@ -41,7 +41,7 @@ async def save_checkpoint_db(state_dict: Dict[str, Any], thread_id: str) -> Dict
         # insert row; state is stored as JSONB
         await conn.execute(
             text(
-                "INSERT INTO checkpoints (id, thread_id, version, state, created_at, updated_at) VALUES (:id, :tid, :ver, :state::jsonb, now(), now())"
+                "INSERT INTO checkpoints (id, thread_id, version, state, created_at, updated_at) VALUES (:id, :tid, :ver, CAST(:state AS jsonb), now(), now())"
             ),
             {"id": new_id, "tid": thread_id, "ver": version, "state": json.dumps(state_dict)},
         )
@@ -90,3 +90,17 @@ async def list_checkpoints_db(thread_id: str) -> List[Dict[str, Any]]:
         for r in rows:
             out.append({"id": r[0], "thread_id": r[1], "version": r[2], "created_at": r[3].isoformat() if hasattr(r[3], "isoformat") else r[3]})
         return out
+
+
+async def delete_checkpoints_db(thread_id: str) -> int:
+    """Delete all checkpoints for `thread_id`. Returns number of rows deleted.
+
+    Intended for test teardown and cleanup.
+    """
+    if not SQLA_AVAILABLE:
+        raise RuntimeError("SQLAlchemy not available")
+
+    engine = await _get_engine()
+    async with engine.begin() as conn:
+        res = await conn.execute(text("DELETE FROM checkpoints WHERE thread_id = :tid"), {"tid": thread_id})
+        return res.rowcount or 0

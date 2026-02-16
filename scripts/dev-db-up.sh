@@ -104,6 +104,14 @@ start_db() {
     terraform output -raw database_url_sync
     echo ""
     echo ""
+    echo "Async TEST DATABASE_URL (for tests):"
+    terraform output -raw database_url_test
+    echo ""
+    echo ""
+    echo "Sync TEST DATABASE_URL (for test tooling):"
+    terraform output -raw database_url_test_sync
+    echo ""
+    echo ""
     echo "To run migrations:"
     echo "  export DATABASE_URL=\$(cd infra/postgres && terraform output -raw database_url_sync)"
     echo "  alembic upgrade head"
