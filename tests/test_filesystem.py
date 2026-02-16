@@ -41,8 +41,10 @@ def test_save_codebase_unified_diff(tmp_path):
 
     diff = """--- a/pkg/mod.py
 +++ b/pkg/mod.py
-new line 1
-new line 2
+@@ -1,1 +1,2 @@
+-old line
++new line 1
++new line 2
 """
     summary = save_codebase(diff, root)
     assert "pkg/mod.py" in summary

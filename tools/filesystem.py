@@ -79,61 +79,37 @@ def load_codebase(
 def _apply_simple_unified_diff(
     root: Path, diff_text: str, write: bool = True
 ) -> Dict[str, Dict[str, str]]:
-    """A conservative unified-diff applier.
+    """Apply a unified diff using the `unidiff` parser.
 
-    This simple implementation supports diffs that include full-file replacements
-    where the new content lines are provided as `+` lines or as plain lines
-    following the header. It is NOT a full patch implementation but is safe for
-    our agent use-cases where diffs replace file contents.
+    Returns a mapping of repo-relative path -> {"new": content, "written": True/False}.
+    This implementation relies on `unidiff.PatchSet` to parse hunks and
+    reconstruct the new file content from context and added lines.
     """
     results: Dict[str, Dict[str, str]] = {}
-    lines = diff_text.splitlines()
-    cur_path: Optional[Path] = None
-    new_lines: List[str] = []
+    try:
+        from unidiff import PatchSet
+    except Exception as e:
+        raise ImportError(
+            "unidiff is required to apply unified diffs. Install with 'pip install unidiff'"
+        ) from e
 
-    for line in lines:
-        # detect new-file header lines like '+++ b/path' or '+++ path'
-        if line.startswith("+++"):
-            # finish previous file
-            if cur_path is not None:
-                results[cur_path.as_posix()] = {
-                    "new": "\n".join(new_lines)
-                    + ("\n" if new_lines and not new_lines[-1].endswith("\n") else "")
-                }
-                new_lines = []
-            # extract path after +++ (formats: '+++ b/path' or '+++ path')
-            parts = line.split(None, 1)
-            if len(parts) > 1:
-                raw = parts[1]
-                if raw.startswith("b/"):
-                    raw = raw[2:]
-                cur_path = Path(raw)
-            else:
-                cur_path = None
+    # PatchSet expects an iterable of lines including line endings
+    patch = PatchSet(diff_text.splitlines(keepends=True))
+
+    for patched_file in patch:
+        rel_path = patched_file.path
+        if not rel_path:
             continue
-
-        if cur_path is None:
-            continue
-
-        # collect added lines. Accept both leading '+' and plain lines
-        if line.startswith("+") and not line.startswith("+++"):
-            new_lines.append(line[1:])
-        else:
-            # treat lines without diff markers as new content too
-            if line and not (
-                line.startswith("-")
-                or line.startswith(" ")
-                or line.startswith("@@")
-                or line.startswith("---")
-                or line.startswith("+++")
-            ):
-                new_lines.append(line)
-
-    if cur_path is not None:
-        results[cur_path.as_posix()] = {
-            "new": "\n".join(new_lines)
-            + ("\n" if new_lines and not new_lines[-1].endswith("\n") else "")
-        }
+        new_lines: List[str] = []
+        for hunk in patched_file:
+            for line in hunk:
+                # include context and added lines to reconstruct new file
+                if line.is_context or line.is_added:
+                    new_lines.append(line.value)
+        new_content = "".join(new_lines)
+        if new_content and not new_content.endswith("\n"):
+            new_content = new_content + "\n"
+        results[rel_path] = {"new": new_content}
 
     # write files (unless parse-only)
     for rel, info in results.items():
