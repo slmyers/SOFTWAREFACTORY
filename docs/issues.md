@@ -164,10 +164,10 @@ After any run, spec.md and all code files are up-to-date on disk.
 Central decision maker.
 
 ## Tasks
-- [ ] Create `agents/supervisor.py`
-- [ ] Implement routing based on quality_score, invariants, test_results
-- [ ] Support human pause
-- [ ] Use DeepSeek-R1 for decisions
+- [x] Create `agents/supervisor.py`
+- [x] Implement routing based on quality_score, invariants, test_results
+- [x] Support human pause
+- [x] Use DeepSeek-R1 for decisions
 
 ## Definition of Done
 Supervisor correctly routes to next node in a test graph.
