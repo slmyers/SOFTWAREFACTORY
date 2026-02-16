@@ -31,3 +31,9 @@ env/
 
 # LangSmith specific
 .langgraph_api/
+
+# Terraform / providers (ignore runtime plugin dirs and provider binaries)
+**/.terraform/
+**/.terraform/**/providers/
+**/.terraform/**/plugins/
+**/terraform-provider-*
