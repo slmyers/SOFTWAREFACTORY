@@ -95,11 +95,11 @@ State passes Pydantic validation and can be checkpointed.
 Create the self-documenting files that agents will read/write.
 
 ## Tasks
-- [ ] Create `docs/AGENTS.md` (role descriptions)
-- [ ] Create `harness/quality-score.md` template
-- [ ] Create `harness/invariants.md` template
-- [ ] Create `harness/exec-plans/` directory with example
-- [ ] Make a small script that auto-generates these on first run
+- [x] Create `docs/AGENTS.md` (role descriptions)
+- [x] Create `harness/quality-score.md` template
+- [x] Create `harness/invariants.md` template
+- [x] Create `harness/exec-plans/` directory with example
+- [x] Make a small script that auto-generates these on first run
 
 ## Definition of Done
 Templates exist and match the Harness philosophy.
@@ -125,6 +125,8 @@ Make the graph resumable across runs.
 - [ ] Implement JSON file fallback
 - [ ] Add `save_checkpoint` / `load_checkpoint` to state
 - [ ] Use LangGraph’s built-in checkpointing with custom saver
+- [ ] Add terraform config for local postgres with docker
+- [ ] Add any necessary migrations
 
 ## Definition of Done
 A run can be killed and resumed with `python main.py resume --thread_id xxx`
