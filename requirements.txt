@@ -10,3 +10,9 @@ rich
 # Test / dev
 pytest
 pytest-asyncio
+
+# DB
+sqlalchemy>=2.0
+asyncpg
+alembic
+
