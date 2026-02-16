@@ -25,15 +25,21 @@ def test_valid_state_roundtrip():
 
 def test_negative_iteration_raises():
     with pytest.raises(ValidationError):
-        AgentStateModel(spec_path="specs/todo.md", codebase={}, iteration=-1, quality_score=10.0)
+        AgentStateModel(
+            spec_path="specs/todo.md", codebase={}, iteration=-1, quality_score=10.0
+        )
 
 
 def test_quality_score_bounds():
     with pytest.raises(ValidationError):
-        AgentStateModel(spec_path="specs/todo.md", codebase={}, iteration=0, quality_score=-0.1)
+        AgentStateModel(
+            spec_path="specs/todo.md", codebase={}, iteration=0, quality_score=-0.1
+        )
 
     with pytest.raises(ValidationError):
-        AgentStateModel(spec_path="specs/todo.md", codebase={}, iteration=0, quality_score=101)
+        AgentStateModel(
+            spec_path="specs/todo.md", codebase={}, iteration=0, quality_score=101
+        )
 
 
 def test_checkpoint_file_roundtrip(tmp_path: Path):

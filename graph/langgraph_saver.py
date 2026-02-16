@@ -4,6 +4,7 @@ This adapter provides a minimal attach point for LangGraph to call the
 canonical checkpoint API implemented in graph.state. For now it marks the
 graph object so higher-level code can detect the presence of a custom saver.
 """
+
 from typing import Any
 
 

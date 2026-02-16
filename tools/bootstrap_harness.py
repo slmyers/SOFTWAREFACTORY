@@ -3,6 +3,7 @@
 Creates required templates for Issue #4 if missing.
 This function is intentionally idempotent and never overwrites existing files.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

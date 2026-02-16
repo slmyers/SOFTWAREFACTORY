@@ -7,20 +7,22 @@ This module configures Alembic to:
 - Support async migrations via asyncpg
 - Auto-generate migrations from SQLAlchemy models
 """
+
 from __future__ import annotations
 
 import os
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+
+from alembic import context
 
 # Import the metadata from our models for autogenerate support
 # This will be available once graph/persistence.py is implemented (Agent B)
 try:
     from graph.persistence import Base
+
     target_metadata = Base.metadata
 except ImportError:
     target_metadata = None

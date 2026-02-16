@@ -1,13 +1,15 @@
-import asyncio
-import pytest
 from pathlib import Path
+
+import pytest
 
 import graph.persistence as persistence
 from graph.state import AgentStateModel, save_checkpoint
 
 
 @pytest.mark.asyncio
-async def test_save_checkpoint_falls_back_to_file_on_db_error(tmp_path: Path, monkeypatch):
+async def test_save_checkpoint_falls_back_to_file_on_db_error(
+    tmp_path: Path, monkeypatch
+):
     # Force persistence.save_checkpoint_db to raise so the file-fallback path is exercised
     async def _raise(*args, **kwargs):
         raise RuntimeError("simulated db failure")

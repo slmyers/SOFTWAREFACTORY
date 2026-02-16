@@ -1,7 +1,9 @@
 from pathlib import Path
 
 
-def test_boostrap_creates_expected_files_and_prints_message(tmp_path: Path, monkeypatch, capsys):
+def test_boostrap_creates_expected_files_and_prints_message(
+    tmp_path: Path, monkeypatch, capsys
+):
     """bootstrap_harness should create harness/docs scaffolding and print a message."""
     monkeypatch.chdir(tmp_path)
 
@@ -19,16 +21,22 @@ def test_boostrap_creates_expected_files_and_prints_message(tmp_path: Path, monk
     assert (tmp_path / "harness" / "invariants.md").exists()
     assert (tmp_path / "docs" / "AGENTS.md").exists()
 
-    assert (tmp_path / "harness" / "quality-score.md").read_text().strip() == './quality-score.md'
-    assert (tmp_path / "harness" / "invariants.md").read_text().strip() == './invariants.md'
-    assert (tmp_path / "docs" / "AGENTS.md").read_text().strip() == './AGENTS.md'
+    assert (
+        tmp_path / "harness" / "quality-score.md"
+    ).read_text().strip() == "./quality-score.md"
+    assert (
+        tmp_path / "harness" / "invariants.md"
+    ).read_text().strip() == "./invariants.md"
+    assert (tmp_path / "docs" / "AGENTS.md").read_text().strip() == "./AGENTS.md"
 
     # printed feedback
     captured = capsys.readouterr()
     assert "Harness scaffolding bootstrapped" in captured.out
 
 
-def test_boostrap_is_idempotent_and_does_not_overwrite_existing_files(tmp_path: Path, monkeypatch, capsys):
+def test_boostrap_is_idempotent_and_does_not_overwrite_existing_files(
+    tmp_path: Path, monkeypatch, capsys
+):
     """Running bootstrap twice must not overwrite existing files."""
     monkeypatch.chdir(tmp_path)
 

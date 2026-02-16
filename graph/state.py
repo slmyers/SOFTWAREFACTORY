@@ -10,12 +10,17 @@ Design decisions (v0):
 - Checkpoint persistence: JSON file fallback (sync) — DB deferred to Issue #5.
 - `plan` and `test_results` remain `list[dict]` for now.
 """
+
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict, Union
+from typing import Any, Dict, List, Optional, TypedDict, Union
+from uuid import uuid4
 
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, field_validator
+
+import graph.persistence as persistence
 
 
 class AgentState(TypedDict):
@@ -92,11 +97,6 @@ class AgentStateModel(BaseModel):
 
 
 # Async canonical checkpoint API (DB preferred, file fallback)
-import os
-from datetime import datetime
-from uuid import uuid4
-from typing import Optional
-import graph.persistence as persistence
 
 
 async def save_checkpoint(state: "AgentStateModel", thread_id: str) -> dict:
@@ -108,10 +108,17 @@ async def save_checkpoint(state: "AgentStateModel", thread_id: str) -> dict:
         # fallback to file-based checkpoint
         path = Path("checkpoints") / f"{thread_id}.json"
         state.save_checkpoint(path)
-        return {"id": str(uuid4()), "thread_id": thread_id, "version": 1, "created_at": datetime.utcnow().isoformat()}
+        return {
+            "id": str(uuid4()),
+            "thread_id": thread_id,
+            "version": 1,
+            "created_at": datetime.utcnow().isoformat(),
+        }
 
 
-async def load_checkpoint(thread_id: str, version: Optional[int] = None) -> "AgentStateModel":
+async def load_checkpoint(
+    thread_id: str, version: Optional[int] = None
+) -> "AgentStateModel":
     """Load checkpoint: prefer DB, fallback to file."""
     try:
         data = await persistence.load_checkpoint_db(thread_id, version=version)
@@ -119,4 +126,3 @@ async def load_checkpoint(thread_id: str, version: Optional[int] = None) -> "Age
     except Exception:
         path = Path("checkpoints") / f"{thread_id}.json"
         return AgentStateModel.load_checkpoint(path)
-

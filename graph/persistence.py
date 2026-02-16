@@ -1,12 +1,13 @@
-import os
 import json
-from typing import Any, Dict, List, Optional
+import os
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 try:
-    from sqlalchemy.ext.asyncio import create_async_engine
     from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import create_async_engine
+
     SQLA_AVAILABLE = True
 except Exception:  # pragma: no cover - optional dependency
     SQLA_AVAILABLE = False
@@ -22,7 +23,9 @@ async def _get_engine():
     return create_async_engine(db_url, future=True, echo=False)
 
 
-async def save_checkpoint_db(state_dict: Dict[str, Any], thread_id: str) -> Dict[str, Any]:
+async def save_checkpoint_db(
+    state_dict: Dict[str, Any], thread_id: str
+) -> Dict[str, Any]:
     """Save checkpoint to Postgres JSONB `checkpoints` table.
 
     This function intentionally raises on any DB-related error so callers can
@@ -34,7 +37,12 @@ async def save_checkpoint_db(state_dict: Dict[str, Any], thread_id: str) -> Dict
     engine = await _get_engine()
     async with engine.begin() as conn:
         # compute next version
-        result = await conn.execute(text("SELECT COALESCE(MAX(version), 0) FROM checkpoints WHERE thread_id = :tid"), {"tid": thread_id})
+        result = await conn.execute(
+            text(
+                "SELECT COALESCE(MAX(version), 0) FROM checkpoints WHERE thread_id = :tid"
+            ),
+            {"tid": thread_id},
+        )
         maxv = result.scalar()
         version = (maxv or 0) + 1
         new_id = str(uuid4())
@@ -43,12 +51,24 @@ async def save_checkpoint_db(state_dict: Dict[str, Any], thread_id: str) -> Dict
             text(
                 "INSERT INTO checkpoints (id, thread_id, version, state, created_at, updated_at) VALUES (:id, :tid, :ver, CAST(:state AS jsonb), now(), now())"
             ),
-            {"id": new_id, "tid": thread_id, "ver": version, "state": json.dumps(state_dict)},
+            {
+                "id": new_id,
+                "tid": thread_id,
+                "ver": version,
+                "state": json.dumps(state_dict),
+            },
         )
-        return {"id": new_id, "thread_id": thread_id, "version": version, "created_at": datetime.utcnow().isoformat()}
+        return {
+            "id": new_id,
+            "thread_id": thread_id,
+            "version": version,
+            "created_at": datetime.utcnow().isoformat(),
+        }
 
 
-async def load_checkpoint_db(thread_id: str, version: Optional[int] = None) -> Dict[str, Any]:
+async def load_checkpoint_db(
+    thread_id: str, version: Optional[int] = None
+) -> Dict[str, Any]:
     """Load checkpoint payload (state dict) from DB. Returns the state dict.
 
     Raises on DB errors so callers can fallback to file-based load.
@@ -59,10 +79,14 @@ async def load_checkpoint_db(thread_id: str, version: Optional[int] = None) -> D
     engine = await _get_engine()
     async with engine.begin() as conn:
         if version is None:
-            q = text("SELECT state FROM checkpoints WHERE thread_id = :tid ORDER BY version DESC LIMIT 1")
+            q = text(
+                "SELECT state FROM checkpoints WHERE thread_id = :tid ORDER BY version DESC LIMIT 1"
+            )
             params = {"tid": thread_id}
         else:
-            q = text("SELECT state FROM checkpoints WHERE thread_id = :tid AND version = :ver LIMIT 1")
+            q = text(
+                "SELECT state FROM checkpoints WHERE thread_id = :tid AND version = :ver LIMIT 1"
+            )
             params = {"tid": thread_id, "ver": version}
         result = await conn.execute(q, params)
         row = result.first()
@@ -83,12 +107,23 @@ async def list_checkpoints_db(thread_id: str) -> List[Dict[str, Any]]:
 
     engine = await _get_engine()
     async with engine.begin() as conn:
-        q = text("SELECT id, thread_id, version, created_at FROM checkpoints WHERE thread_id = :tid ORDER BY version DESC")
+        q = text(
+            "SELECT id, thread_id, version, created_at FROM checkpoints WHERE thread_id = :tid ORDER BY version DESC"
+        )
         result = await conn.execute(q, {"tid": thread_id})
         rows = result.fetchall()
         out = []
         for r in rows:
-            out.append({"id": r[0], "thread_id": r[1], "version": r[2], "created_at": r[3].isoformat() if hasattr(r[3], "isoformat") else r[3]})
+            out.append(
+                {
+                    "id": r[0],
+                    "thread_id": r[1],
+                    "version": r[2],
+                    "created_at": (
+                        r[3].isoformat() if hasattr(r[3], "isoformat") else r[3]
+                    ),
+                }
+            )
         return out
 
 
@@ -102,5 +137,7 @@ async def delete_checkpoints_db(thread_id: str) -> int:
 
     engine = await _get_engine()
     async with engine.begin() as conn:
-        res = await conn.execute(text("DELETE FROM checkpoints WHERE thread_id = :tid"), {"tid": thread_id})
+        res = await conn.execute(
+            text("DELETE FROM checkpoints WHERE thread_id = :tid"), {"tid": thread_id}
+        )
         return res.rowcount or 0
