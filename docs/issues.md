@@ -144,9 +144,9 @@ A run can be killed and resumed with `python main.py resume --thread_id xxx`
 Agents must always work against real files on disk.
 
 ## Tasks
-- [ ] Implement `load_spec()` and `save_spec()`
-- [ ] Implement `load_codebase()` / `save_codebase()` (dict ↔ disk)
-- [ ] Add gitignore for temp files
+- [x] Implement `load_spec()` and `save_spec()`
+- [x] Implement `load_codebase()` / `save_codebase()` (dict ↔ disk)
+- [x] Add gitignore for temp files
 
 ## Definition of Done
 After any run, spec.md and all code files are up-to-date on disk.
