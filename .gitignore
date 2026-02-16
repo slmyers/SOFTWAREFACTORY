@@ -37,3 +37,34 @@ env/
 **/.terraform/**/providers/
 **/.terraform/**/plugins/
 **/terraform-provider-*
+
+# Terraform state / variables / plans (keep lockfile committed)
+# Ignore generic state files and backups
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+
+# Ignore variable files (may contain secrets)
+*.tfvars
+*.tfvars.json
+*.tfvars.local
+
+# Ignore override and plan artifacts
+override.tf
+override.tf.json
+*_override.tf
+crash.log
+plan.out
+*.tfplan
+
+# Terraform client/machine-level files
+.terraform.d/
+.terraformrc
+
+# Infra-specific generated archives
+infra/**/*.zip
+infra/**/*.tgz
+
+# Also ignore any infra-scoped state files explicitly
+infra/**/terraform.tfstate*
