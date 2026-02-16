@@ -89,3 +89,34 @@ class AgentStateModel(BaseModel):
     class Config:
         extra = "forbid"
         frozen = False
+
+
+# Async canonical checkpoint API (DB preferred, file fallback)
+import os
+from datetime import datetime
+from uuid import uuid4
+from typing import Optional
+import graph.persistence as persistence
+
+
+async def save_checkpoint(state: "AgentStateModel", thread_id: str) -> dict:
+    """Persist state: prefer DB, fallback to file. Returns metadata dict."""
+    data = state.to_dict()
+    try:
+        return await persistence.save_checkpoint_db(data, thread_id)
+    except Exception:
+        # fallback to file-based checkpoint
+        path = Path("checkpoints") / f"{thread_id}.json"
+        state.save_checkpoint(path)
+        return {"id": str(uuid4()), "thread_id": thread_id, "version": 1, "created_at": datetime.utcnow().isoformat()}
+
+
+async def load_checkpoint(thread_id: str, version: Optional[int] = None) -> "AgentStateModel":
+    """Load checkpoint: prefer DB, fallback to file."""
+    try:
+        data = await persistence.load_checkpoint_db(thread_id, version=version)
+        return AgentStateModel.from_dict(data)
+    except Exception:
+        path = Path("checkpoints") / f"{thread_id}.json"
+        return AgentStateModel.load_checkpoint(path)
+
