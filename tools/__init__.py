@@ -1,5 +1,6 @@
 """Shared tooling helpers for SOFTWAREFACTORY."""
 
+from .browser import BROWSER_TOOLS, browser_action, browser_tool_node
 from .filesystem import (
     FILESYSTEM_TOOLS,
     filesystem_tool_node,
@@ -24,4 +25,7 @@ __all__ = [
     "grep",
     "FILESYSTEM_TOOLS",
     "filesystem_tool_node",
+    "browser_action",
+    "BROWSER_TOOLS",
+    "browser_tool_node",
 ]

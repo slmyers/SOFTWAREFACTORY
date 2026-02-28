@@ -15,6 +15,7 @@ from typing import Any, Dict, Optional
 _REGISTRY: Dict[str, str] = {
     "genai-toolbox": "http://localhost:5000",
     "mcp-obsidian": "http://localhost:5001",
+    "playwright-mcp": "http://localhost:3000",
 }
 
 

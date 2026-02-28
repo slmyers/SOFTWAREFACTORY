@@ -1,0 +1,39 @@
+# docker-compose.yml — SOFTWAREFACTORY services (issue #49)
+#
+# Services:
+#   playwright-mcp  — Microsoft Playwright MCP server (headless browser control)
+#
+# Usage:
+#   docker compose up -d playwright-mcp
+#   docker compose down
+#
+# The playwright-mcp service exposes the MCP HTTP interface on port 3000.
+# Agents discover it automatically via MCP_SERVER_PLAYWRIGHT_MCP or the
+# built-in registry default (http://localhost:3000).
+
+version: "3.9"
+
+services:
+  playwright-mcp:
+    image: mcr.microsoft.com/playwright/mcp:latest
+    container_name: softwarefactory_playwright_mcp
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Run fully headless; no display required
+      PLAYWRIGHT_HEADLESS: "true"
+      # Persist browser state across requests
+      PLAYWRIGHT_PERSISTENT_CONTEXT: "true"
+    volumes:
+      # Mount a host directory for video recordings and snapshots
+      - playwright_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  playwright_data:
