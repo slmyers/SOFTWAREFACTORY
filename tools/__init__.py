@@ -1,5 +1,6 @@
 """Shared tooling helpers for SOFTWAREFACTORY."""
 
+from .file_edits import DiffPreview, apply_unified_diff, diff_preview
 from .filesystem import (
     FILESYSTEM_TOOLS,
     filesystem_tool_node,
@@ -24,4 +25,7 @@ __all__ = [
     "grep",
     "FILESYSTEM_TOOLS",
     "filesystem_tool_node",
+    "apply_unified_diff",
+    "DiffPreview",
+    "diff_preview",
 ]
