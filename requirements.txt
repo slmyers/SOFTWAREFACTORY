@@ -25,3 +25,6 @@ unidiff>=0.7.0
 
 # AI models
 openai
+
+# Semantic code index (Issue #48)
+chromadb>=1.0.0
