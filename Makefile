@@ -1,4 +1,7 @@
-.PHONY: lint format fix precommit-install precommit-run
+.PHONY: test lint format fix precommit-install precommit-run
+
+test:
+	./.venv/bin/python -m pytest -q
 
 lint:
 	python -m ruff check .

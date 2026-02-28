@@ -1,18 +1,12 @@
-from langgraph.graph import END, START, StateGraph
+"""Backward-compatibility shim — exports the compiled graph for langgraph.json.
 
-from graph.state import AgentState
+Do not add logic here.  See graph/compile.py for the canonical factory.
+"""
+
+from graph.compile import compile_graph
 from tools.bootstrap_harness import ensure_harness_scaffolding
 
 ensure_harness_scaffolding()
 
-
-def chatbot(state: AgentState):
-    return {"messages": ["Hello from Software Factory!"]}
-
-
-graph_builder = StateGraph(AgentState)
-graph_builder.add_node("chatbot", chatbot)
-graph_builder.add_edge(START, "chatbot")
-graph_builder.add_edge("chatbot", END)
-
-graph = graph_builder.compile()
+# LangGraph Studio / langgraph.json resolve this module-level object
+graph = compile_graph()

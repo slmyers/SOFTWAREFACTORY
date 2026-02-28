@@ -5,6 +5,10 @@ import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
+from unidiff import PatchSet
+
+DEFAULT_PATTERNS = ["*.py", "*.md", "*.json"]
+
 
 def _ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -31,7 +35,15 @@ def _is_safe_path(root: Path, target: Path) -> bool:
     try:
         root_res = root.resolve()
         target_res = target.resolve()
-        return str(target_res).startswith(str(root_res))
+        # Use Path.is_relative_to when available to avoid false positives
+        try:
+            return target_res.is_relative_to(root_res)
+        except AttributeError:
+            try:
+                target_res.relative_to(root_res)
+                return True
+            except Exception:
+                return False
     except Exception:
         return False
 
@@ -66,7 +78,7 @@ def load_codebase(
     """
     r = Path(root)
     if patterns is None:
-        patterns = ["*.py", "*.md", "*.json"]
+        patterns = DEFAULT_PATTERNS.copy()
     files: Dict[str, str] = {}
     for pattern in patterns:
         for p in r.rglob(pattern):
@@ -86,12 +98,6 @@ def _apply_simple_unified_diff(
     reconstruct the new file content from context and added lines.
     """
     results: Dict[str, Dict[str, str]] = {}
-    try:
-        from unidiff import PatchSet
-    except Exception as e:
-        raise ImportError(
-            "unidiff is required to apply unified diffs. Install with 'pip install unidiff'"
-        ) from e
 
     # PatchSet expects an iterable of lines including line endings
     patch = PatchSet(diff_text.splitlines(keepends=True))

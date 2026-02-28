@@ -30,3 +30,14 @@ langgraph dev
 ```
 
 See `docs/PLAN.md` for the project plan and issue list.
+
+## Run tests ✅
+
+- Activate the repository virtualenv:
+  - `source .venv/bin/activate`
+- Run tests:
+  - `python -m pytest -q`
+- Or run directly without activating:
+  - `./.venv/bin/python -m pytest -q`
+- Or use the Makefile:
+  - `make test`

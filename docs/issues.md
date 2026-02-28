@@ -185,9 +185,9 @@ Supervisor correctly routes to next node in a test graph.
 Make routing reliable.
 
 ## Tasks
-- [ ] Create prompt templates in `prompts/`
-- [ ] Add few-shot examples for common decisions
-- [ ] Test with 5 synthetic states
+- [x] Create prompt templates in `prompts/`
+- [x] Add few-shot examples for common decisions
+- [x] Test with 5 synthetic states
 
 ## Definition of Done
 Supervisor makes correct routing 95%+ of the time in tests.
