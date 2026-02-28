@@ -29,6 +29,7 @@ from typing import Any, Optional
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 
+from agents.spec_parser import spec_parser_node  # Issue #11
 from agents.supervisor import Supervisor
 from graph.state import AgentState
 
@@ -78,7 +79,6 @@ def _make_stub(node_name: str):
     return _node
 
 
-spec_parser_node = _make_stub("spec_parser")  # Issue #11
 architect_node = _make_stub("architect")  # Issue #12
 planner_node = _make_stub("planner")  # Issue #13
 coder_node = _make_stub("coder")  # Issue #14
