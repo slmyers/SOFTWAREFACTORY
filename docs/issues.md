@@ -205,9 +205,9 @@ Supervisor makes correct routing 95%+ of the time in tests.
 Central place to build the LangGraph.
 
 ## Tasks
-- [ ] Create `graph/compile.py`
-- [ ] Add all 8 nodes as stubs
-- [ ] Wire basic edges + conditional routing
+- [x] Create `graph/compile.py`
+- [x] Add all 8 nodes as stubs
+- [x] Wire basic edges + conditional routing
 
 ## Definition of Done
 `compile_graph()` returns a runnable app.
