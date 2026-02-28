@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import os
+import re
 import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
+from langchain_core.tools import tool
+from langgraph.prebuilt import ToolNode
 from unidiff import PatchSet
 
 DEFAULT_PATTERNS = ["*.py", "*.md", "*.json"]
@@ -169,3 +172,150 @@ def save_codebase(
             target.write_text(content, encoding="utf-8")
         summary[rel] = {"new": content, "written": True}
     return summary
+
+
+# ---------------------------------------------------------------------------
+# LangChain tools — for use with LangGraph ToolNode
+# ---------------------------------------------------------------------------
+
+
+@tool
+def read_file(path: str, project_root: str) -> str:
+    """Read and return the contents of a file inside *project_root*.
+
+    Args:
+        path: Path to the file, relative to *project_root* or absolute.
+        project_root: Absolute path of the project directory.  The resolved
+            *path* must reside inside this directory.
+
+    Returns:
+        The UTF-8 text content of the file.
+
+    Raises:
+        ValueError: If the resolved path escapes *project_root*.
+        FileNotFoundError: If the file does not exist.
+    """
+    root = Path(project_root)
+    target = (root / path) if not Path(path).is_absolute() else Path(path)
+    if not _is_safe_path(root, target):
+        raise ValueError(f"Path escapes project root: {path!r}")
+    if not target.exists():
+        raise FileNotFoundError(target)
+    return target.read_text(encoding="utf-8")
+
+
+@tool
+def write_file(path: str, content: str, project_root: str) -> str:
+    """Write *content* to a file inside *project_root* (atomic write).
+
+    Creates any missing parent directories.  Existing files are overwritten.
+
+    Args:
+        path: Destination path, relative to *project_root* or absolute.
+        content: UTF-8 text to write.
+        project_root: Absolute path of the project directory.  The resolved
+            *path* must reside inside this directory.
+
+    Returns:
+        A short confirmation message with the resolved file path.
+
+    Raises:
+        ValueError: If the resolved path escapes *project_root*.
+    """
+    root = Path(project_root)
+    target = (root / path) if not Path(path).is_absolute() else Path(path)
+    if not _is_safe_path(root, target):
+        raise ValueError(f"Path escapes project root: {path!r}")
+    _atomic_write(target, content)
+    return f"wrote {target}"
+
+
+@tool
+def list_dir(path: str, project_root: str) -> List[str]:
+    """Return a sorted list of entries inside *path* within *project_root*.
+
+    Each entry is a POSIX-style path relative to *project_root*.  Files are
+    returned as-is; directories are shown with a trailing ``/``.
+
+    Args:
+        path: Directory to list, relative to *project_root* or absolute.
+            Pass ``"."`` (or ``""`` / ``project_root``) to list the root itself.
+        project_root: Absolute path of the project directory.
+
+    Returns:
+        Sorted list of relative entry paths (directories end with ``/``).
+
+    Raises:
+        ValueError: If the resolved path escapes *project_root*.
+        NotADirectoryError: If *path* is not a directory.
+    """
+    root = Path(project_root)
+    if path in ("", "."):
+        target = root
+    else:
+        target = (root / path) if not Path(path).is_absolute() else Path(path)
+    if not _is_safe_path(root, target):
+        raise ValueError(f"Path escapes project root: {path!r}")
+    if not target.is_dir():
+        raise NotADirectoryError(target)
+    entries = []
+    for entry in sorted(target.iterdir()):
+        rel = entry.relative_to(root).as_posix()
+        entries.append(rel + "/" if entry.is_dir() else rel)
+    return entries
+
+
+@tool
+def grep(pattern: str, path: str, project_root: str, recursive: bool = True) -> List[str]:
+    """Search files under *path* for lines matching *pattern* (regex).
+
+    Args:
+        pattern: Python ``re`` regular expression to search for.
+        path: File or directory to search, relative to *project_root* or
+            absolute.  Pass ``"."`` to search the entire project.
+        project_root: Absolute path of the project directory.
+        recursive: When *True* (default) and *path* is a directory, recurse
+            into sub-directories.
+
+    Returns:
+        List of match strings in ``"<rel_path>:<lineno>:<line>"`` format.
+
+    Raises:
+        ValueError: If the resolved path escapes *project_root*.
+    """
+    root = Path(project_root)
+    if path in ("", "."):
+        target = root
+    else:
+        target = (root / path) if not Path(path).is_absolute() else Path(path)
+    if not _is_safe_path(root, target):
+        raise ValueError(f"Path escapes project root: {path!r}")
+
+    compiled = re.compile(pattern)
+    results: List[str] = []
+
+    def _search_file(fp: Path) -> None:
+        try:
+            for lineno, line in enumerate(fp.read_text(encoding="utf-8", errors="replace").splitlines(), start=1):
+                if compiled.search(line):
+                    rel = fp.relative_to(root).as_posix()
+                    results.append(f"{rel}:{lineno}:{line}")
+        except (OSError, IsADirectoryError):
+            pass
+
+    if target.is_file():
+        _search_file(target)
+    elif target.is_dir():
+        iter_fn = target.rglob("*") if recursive else target.glob("*")
+        for fp in sorted(iter_fn):
+            if fp.is_file():
+                _search_file(fp)
+
+    return results
+
+
+# Ordered list of all filesystem tools — bind to a LangGraph ToolNode
+FILESYSTEM_TOOLS = [read_file, write_file, list_dir, grep]
+
+# Ready-to-use LangGraph ToolNode for the filesystem tool suite
+filesystem_tool_node = ToolNode(FILESYSTEM_TOOLS)
