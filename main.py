@@ -5,12 +5,14 @@ Commands
 run     -- Start a new graph run from a spec file.
 dev     -- Same as run but with verbose/debug output enabled.
 resume  -- Resume a previous run from a saved checkpoint thread.
+diff    -- Preview a unified diff without applying it.
 
 Usage examples
 --------------
   python main.py run --spec specs/todo.md
   python main.py dev --spec specs/todo.md
   python main.py resume --thread-id <uuid>
+  python main.py diff --patch path/to/changes.diff --root .
 """
 
 from __future__ import annotations
@@ -25,6 +27,7 @@ from rich.console import Console
 
 from graph.compile import compile_graph
 from graph.state import AgentStateModel, load_checkpoint
+from tools.file_edits import apply_unified_diff, diff_preview
 
 app = typer.Typer(name="softwarefactory", add_completion=False)
 console = Console()
@@ -135,6 +138,41 @@ def resume(
             f"[bold red]Error:[/bold red] No checkpoint found for thread_id={thread_id!r}"
         )
         raise typer.Exit(code=1)
+
+
+@app.command()
+def diff(
+    patch: str = typer.Option(..., "--patch", help="Path to a .diff / .patch file"),
+    root: str = typer.Option(".", "--root", help="Project root directory (default: current directory)"),
+    apply: bool = typer.Option(False, "--apply", help="Apply the diff after previewing it"),
+) -> None:
+    """Preview (and optionally apply) a unified diff inside the project root."""
+    patch_path = Path(patch)
+    if not patch_path.exists():
+        console.print(f"[bold red]Error:[/bold red] patch file not found: {patch!r}")
+        raise typer.Exit(code=1)
+
+    diff_content = patch_path.read_text(encoding="utf-8")
+    root_path = Path(root).resolve()
+
+    try:
+        preview = diff_preview(diff_content, root_path)
+    except ValueError as exc:
+        console.print(f"[bold red]Invalid diff:[/bold red] {exc}")
+        raise typer.Exit(code=1)
+
+    console.print(f"[bold cyan]Diff preview:[/bold cyan] {preview.summary}")
+    for f in preview.files_changed:
+        console.print(f"  [yellow]{f}[/yellow]")
+
+    if apply:
+        try:
+            results = apply_unified_diff(diff_content, root_path)
+        except ValueError as exc:
+            console.print(f"[bold red]Apply failed:[/bold red] {exc}")
+            raise typer.Exit(code=1)
+        written = [p for p, info in results.items() if info.get("written")]
+        console.print(f"[green]Applied:[/green] {len(written)} file(s) written.")
 
 
 if __name__ == "__main__":
