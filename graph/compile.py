@@ -29,6 +29,7 @@ from typing import Any, Optional
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 
+from agents.doc_gardener import DocGardener
 from agents.supervisor import Supervisor
 from graph.state import AgentState
 
@@ -86,7 +87,11 @@ executor_node = _make_stub("executor")  # Issue #15
 sandbox_node = _make_stub("sandbox")  # Issue #16
 reviewer_node = _make_stub("reviewer")  # Issue #17
 refiner_node = _make_stub("refiner")  # Issue #18
-doc_gardener_node = _make_stub("doc_gardener")  # Issue #19
+
+
+def doc_gardener_node(state: AgentState) -> dict:
+    """DocGardener node: find stale exec-plans/docs and append proposals to issues."""
+    return DocGardener().run(state)
 
 
 # ---------------------------------------------------------------------------
